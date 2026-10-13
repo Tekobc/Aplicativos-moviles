@@ -1,21 +1,20 @@
 import { useEffect, useState } from 'react';
-
 import {
     ActivityIndicator,
     StyleSheet,
+    Text,
     View,
 } from 'react-native';
-
 import { NavigationContainer } from '@react-navigation/native';
-
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import { onAuthStateChanged } from 'firebase/auth';
-
+import { Ionicons } from '@expo/vector-icons';
 import { auth } from '../firebase/firebase';
+import { theme } from '../styles/theme';
 
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import TasksScreen from '../screens/TasksScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 
@@ -26,16 +25,9 @@ export default function AppNavigator() {
     const [checkingSession, setCheckingSession] = useState(true);
 
     useEffect(() => {
-        // Escucha los cambios en el estado de autenticación de Firebase.
         const unsubscribe = onAuthStateChanged(
             auth,
-            currentUser => {
-                if (currentUser) {
-                    console.log('Usuario autenticado');
-                } else {
-                    console.log('Sin usuario');
-                }
-
+            (currentUser) => {
                 setUser(currentUser);
                 setCheckingSession(false);
             },
@@ -47,10 +39,15 @@ export default function AppNavigator() {
     if (checkingSession) {
         return (
             <View style={styles.loadingContainer}>
+                <View style={styles.splashIconContainer}>
+                    <Ionicons name="sparkles" size={36} color={theme.colors.primary} />
+                </View>
                 <ActivityIndicator
                     size="large"
-                    color="#2563eb"
+                    color={theme.colors.primary}
+                    style={styles.spinner}
                 />
+                <Text style={styles.loadingText}>Cargando tu aplicación...</Text>
             </View>
         );
     }
@@ -58,36 +55,42 @@ export default function AppNavigator() {
     return (
         <NavigationContainer>
             {user ? (
-                // Stack para usuarios autenticados.
+                // Stack para usuarios autenticados
                 <Stack.Navigator
                     initialRouteName="Inicio"
                     screenOptions={{
                         headerShown: false,
+                        animation: 'slide_from_right',
+                        contentStyle: { backgroundColor: theme.colors.background },
                     }}
                 >
                     <Stack.Screen
                         name="Inicio"
                         component={HomeScreen}
                     />
-
                     <Stack.Screen
                         name="Perfil"
                         component={ProfileScreen}
                     />
+                    <Stack.Screen
+                        name="Tareas"
+                        component={TasksScreen}
+                    />
                 </Stack.Navigator>
             ) : (
-                // Stack para usuarios no autenticados.
+                // Stack para usuarios no autenticados
                 <Stack.Navigator
                     initialRouteName="Login"
                     screenOptions={{
                         headerShown: false,
+                        animation: 'slide_from_right',
+                        contentStyle: { backgroundColor: theme.colors.background },
                     }}
                 >
                     <Stack.Screen
                         name="Login"
                         component={LoginScreen}
                     />
-
                     <Stack.Screen
                         name="Registro"
                         component={RegisterScreen}
@@ -103,6 +106,26 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8fafc',
+        backgroundColor: theme.colors.background,
+        padding: 24,
+    },
+    splashIconContainer: {
+        width: 72,
+        height: 72,
+        borderRadius: 22,
+        backgroundColor: theme.colors.primaryLight,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: theme.colors.primaryBorder,
+        marginBottom: 20,
+    },
+    spinner: {
+        marginBottom: 12,
+    },
+    loadingText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: theme.colors.textSecondary,
     },
 });
