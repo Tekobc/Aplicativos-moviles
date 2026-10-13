@@ -1,121 +1,180 @@
 import { Platform, StyleSheet } from 'react-native';
+import { theme } from './theme';
 
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8fafc',
+        backgroundColor: theme.colors.background,
     },
     scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 24,
-        paddingVertical: 36,
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        paddingBottom: 40,
     },
-    header: {
-        marginBottom: 28,
+    topBar: {
+        flexDirection: 'row',
         alignItems: 'center',
-    },
-    badge: {
-        backgroundColor: '#eff6ff',
-        borderColor: '#bfdbfe',
-        borderRadius: 20,
-        borderWidth: 1,
-        color: '#2563eb',
-        fontSize: 11,
-        fontWeight: '700',
-        letterSpacing: 1.2,
-        marginBottom: 14,
-        overflow: 'hidden',
-        paddingHorizontal: 12,
-        paddingVertical: 5,
-        textTransform: 'uppercase',
-    },
-    title: {
-        color: '#0f172a',
-        fontSize: 30,
-        fontWeight: '800',
-        letterSpacing: -0.8,
-        marginBottom: 6,
-        textAlign: 'center',
-    },
-    subtitle: {
-        color: '#64748b',
-        fontSize: 15,
-        textAlign: 'center',
-    },
-    card: {
-        backgroundColor: '#ffffff',
-        borderColor: '#f1f5f9',
-        borderRadius: 20,
-        borderWidth: 1,
-        padding: 24,
+        justifyContent: 'space-between',
         marginBottom: 24,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#1e293b',
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.08,
-                shadowRadius: 18,
-            },
-            android: {
-                elevation: 4,
-            },
-            web: {
-                boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04)',
-            },
-        }),
     },
-    cardTitle: {
-        color: '#334155',
-        fontSize: 13,
-        fontWeight: '700',
-        letterSpacing: 0.8,
-        marginBottom: 16,
-        textTransform: 'uppercase',
+    userInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
     },
-    infoRow: {
-        marginBottom: 12,
+    avatar: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: theme.colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...theme.shadows.primary,
     },
-    infoLabel: {
-        color: '#64748b',
+    avatarText: {
+        color: theme.colors.white,
+        fontSize: 20,
+        fontWeight: '800',
+    },
+    greetingText: {
         fontSize: 13,
         fontWeight: '600',
-        marginBottom: 4,
+        color: theme.colors.textMuted,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
-    infoValue: {
-        color: '#0f172a',
-        fontSize: 16,
-        fontWeight: '700',
+    userName: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: theme.colors.text,
     },
-    logoutButton: {
+    statusBadge: {
+        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#ef4444',
-        borderRadius: 12,
-        justifyContent: 'center',
-        minHeight: 52,
-        ...Platform.select({
-            ios: {
-                shadowColor: '#ef4444',
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.25,
-                shadowRadius: 10,
-            },
-            android: {
-                elevation: 3,
-            },
-            web: {
-                boxShadow: '0 4px 14px 0 rgba(239, 68, 68, 0.25)',
-            },
-        }),
+        gap: 6,
+        backgroundColor: theme.colors.successLight,
+        borderColor: theme.colors.successBorder,
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: theme.borderRadius.full,
     },
-    logoutButtonPressed: {
-        backgroundColor: '#dc2626',
+    statusDot: {
+        width: 7,
+        height: 7,
+        borderRadius: 4,
+        backgroundColor: theme.colors.success,
+    },
+    statusText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: theme.colors.successDark,
+    },
+    welcomeBanner: {
+        backgroundColor: theme.colors.primaryLight,
+        borderColor: theme.colors.primaryBorder,
+        borderWidth: 1,
+        borderRadius: theme.borderRadius.xl,
+        padding: 20,
+        marginBottom: 24,
+        position: 'relative',
+        overflow: 'hidden',
+    },
+    welcomeTitle: {
+        fontSize: 18,
+        fontWeight: '800',
+        color: theme.colors.primaryDark,
+        marginBottom: 6,
+    },
+    welcomeSubtitle: {
+        fontSize: 14,
+        color: theme.colors.textSecondary,
+        lineHeight: 20,
+        maxWidth: '85%',
+    },
+    bannerIconWrapper: {
+        position: 'absolute',
+        right: -8,
+        bottom: -8,
+        opacity: 0.15,
+    },
+    sectionTitle: {
+        fontSize: 15,
+        fontWeight: '700',
+        color: theme.colors.textSecondary,
+        letterSpacing: 0.5,
+        textTransform: 'uppercase',
+        marginBottom: 14,
+        marginLeft: 4,
+    },
+    cardsGrid: {
+        gap: 14,
+        marginBottom: 28,
+    },
+    actionCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: theme.colors.surface,
+        borderColor: theme.colors.border,
+        borderWidth: 1,
+        borderRadius: theme.borderRadius.lg,
+        padding: 16,
+        ...theme.shadows.sm,
+    },
+    actionCardPressed: {
+        backgroundColor: '#F1F5F9',
         transform: [{ scale: 0.99 }],
     },
-    logoutButtonText: {
-        color: '#ffffff',
+    cardIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 14,
+    },
+    cardIconIndigo: {
+        backgroundColor: theme.colors.primaryLight,
+    },
+    cardIconCyan: {
+        backgroundColor: theme.colors.accentLight,
+    },
+    cardContent: {
+        flex: 1,
+    },
+    cardTitle: {
         fontSize: 16,
         fontWeight: '700',
-        letterSpacing: 0.2,
+        color: theme.colors.text,
+        marginBottom: 3,
+    },
+    cardDescription: {
+        fontSize: 13,
+        color: theme.colors.textMuted,
+        lineHeight: 18,
+    },
+    chevronWrapper: {
+        marginLeft: 10,
+    },
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: theme.colors.dangerLight,
+        borderColor: theme.colors.dangerBorder,
+        borderWidth: 1,
+        borderRadius: theme.borderRadius.md,
+        minHeight: 50,
+        gap: 8,
+        marginTop: 6,
+    },
+    logoutButtonPressed: {
+        backgroundColor: '#FEE2E2',
+        transform: [{ scale: 0.98 }],
+    },
+    logoutButtonText: {
+        color: theme.colors.danger,
+        fontSize: 15,
+        fontWeight: '700',
     },
 });
