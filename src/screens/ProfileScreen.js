@@ -1,72 +1,304 @@
+import { useEffect, useState } from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
+    ActivityIndicator,
+    Alert,
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
+import { logout } from '../firebase/authService';
 import { auth } from '../firebase/firebase';
+import { getUser } from '../services/userService';
+import { styles } from '../styles/ProfileStyles';
+import { theme } from '../styles/theme';
 
-export default function ProfileScreen({navigation}) {
-  const user = auth.currentUser;
+export default function ProfileScreen({ navigation }) {
+    const user = auth.currentUser;
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil</Text>
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [image, setImage] = useState(null);
 
-      <Text style={styles.label}>Email</Text>
-      <Text style={styles.value}>
-        {user?.email || 'No disponible'}
-      </Text>
+    const pickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['images'],
+                allowsEditing: true,
+                quality: 1,
+            });
 
-      <Text style={styles.label}>UID</Text>
-      <Text style={styles.value}>
-        {user?.uid || 'No disponible'}
-      </Text>
+            if (!result.canceled && result.assets?.length > 0) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.log('Error al seleccionar imagen:', error);
+            Alert.alert('Error', 'No se pudo seleccionar la imagen.');
+        }
+    };
 
-    <Pressable
-        style={({ pressed }) => [
-        styles.profileButton,
-        pressed && styles.profileButtonPressed,
-        ]}
-        onPress={() => navigation.goBack()}
-        >
-        <Text>
-        Go back jome
-        </Text>
-    </Pressable>
+    useEffect(() => {
+        pickImage();
+        const loadProfile = async () => {
+            if (!user) {
+                setLoading(false);
+                return;
+            }
 
-      
-    </View>
-  );
+            try {
+                const data = await getUser(user.uid);
+                setProfile(data);
+            } catch (error) {
+                console.log('Error al cargar perfil:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadProfile();
+    }, [user]);
+
+    const handleLogout = () => {
+        Alert.alert(
+            'Cerrar sesión',
+            '¿Deseas cerrar tu sesión actual?',
+            [
+                { text: 'Cancelar', style: 'cancel' },
+                {
+                    text: 'Cerrar sesión',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await logout();
+                        } catch (error) {
+                            Alert.alert('Error', 'No se pudo cerrar la sesión.');
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
+    const displayName =
+        profile?.nombre ||
+        user?.displayName ||
+        user?.email?.split('@')[0] ||
+        'Usuario';
+
+    const displayEmail = profile?.email || user?.email || 'No disponible';
+    const initial = displayName ? displayName.charAt(0).toUpperCase() : 'U';
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.header}>
+                    <Pressable
+                        style={styles.backButton}
+                        onPress={() => navigation.goBack()}
+                        hitSlop={8}
+                    >
+                        <Ionicons
+                            name="arrow-back"
+                            size={20}
+                            color={theme.colors.text}
+                        />
+                    </Pressable>
+
+                    <Text style={styles.headerTitle}>Mi Perfil</Text>
+                    <View style={styles.headerPlaceholder} />
+                </View>
+
+                {loading ? (
+                    <View style={styles.loaderContainer}>
+                        <ActivityIndicator
+                            size="large"
+                            color={theme.colors.primary}
+                        />
+                    </View>
+                ) : (
+                    <>
+                        <View style={styles.heroCard}>
+                            <Pressable
+                                style={styles.avatarWrapper}
+                                onPress={pickImage}
+                                accessibilityRole="button"
+                                accessibilityLabel="Seleccionar foto de perfil"
+                            >
+                                {image ? (
+                                    <Image
+                                        source={{ uri: image }}
+                                        style={{
+                                            width: 100,
+                                            height: 100,
+                                            borderRadius: 50,
+                                        }}
+                                    />
+                                ) : (
+                                    <Text style={styles.avatarText}>
+                                        {initial}
+                                    </Text>
+                                )}
+                            </Pressable>
+
+                            <Text style={styles.heroName}>{displayName}</Text>
+                            <Text style={styles.heroEmail}>{displayEmail}</Text>
+
+                            <View style={styles.verifiedBadge}>
+                                <Ionicons
+                                    name="shield-checkmark"
+                                    size={14}
+                                    color={theme.colors.success}
+                                />
+                                <Text style={styles.verifiedText}>
+                                    Cuenta Activa
+                                </Text>
+                            </View>
+                        </View>
+
+                        <Text style={styles.sectionTitle}>
+                            Detalles de la cuenta
+                        </Text>
+
+                        <View style={styles.infoCard}>
+                            <View
+                                style={[
+                                    styles.infoRow,
+                                    styles.infoRowBorder,
+                                ]}
+                            >
+                                <View style={styles.infoIconWrapper}>
+                                    <Ionicons
+                                        name="person-outline"
+                                        size={18}
+                                        color={theme.colors.primary}
+                                    />
+                                </View>
+
+                                <View style={styles.infoTextWrapper}>
+                                    <Text style={styles.infoLabel}>
+                                        Nombre completo
+                                    </Text>
+                                    <Text style={styles.infoValue}>
+                                        {displayName}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View
+                                style={[
+                                    styles.infoRow,
+                                    styles.infoRowBorder,
+                                ]}
+                            >
+                                <View style={styles.infoIconWrapper}>
+                                    <Ionicons
+                                        name="mail-outline"
+                                        size={18}
+                                        color={theme.colors.primary}
+                                    />
+                                </View>
+
+                                <View style={styles.infoTextWrapper}>
+                                    <Text style={styles.infoLabel}>
+                                        Correo electrónico
+                                    </Text>
+                                    <Text style={styles.infoValue}>
+                                        {displayEmail}
+                                    </Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.infoRow}>
+                                <View style={styles.infoIconWrapper}>
+                                    <Ionicons
+                                        name="finger-print-outline"
+                                        size={18}
+                                        color={theme.colors.primary}
+                                    />
+                                </View>
+
+                                <View style={styles.infoTextWrapper}>
+                                    <Text style={styles.infoLabel}>
+                                        Identificador (UID)
+                                    </Text>
+                                    <Text
+                                        style={styles.uidValue}
+                                        numberOfLines={1}
+                                        ellipsizeMode="middle"
+                                    >
+                                        {user?.uid || 'Desconocido'}
+                                    </Text>
+                                </View>
+                            </View>
+                        </View>
+
+                        <Text style={styles.sectionTitle}>
+                            Acciones rápidas
+                        </Text>
+
+                        <View style={styles.actionsContainer}>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.primaryButton,
+                                    pressed && styles.primaryButtonPressed,
+                                ]}
+                                onPress={() => navigation.navigate('Tareas')}
+                            >
+                                <Ionicons
+                                    name="checkbox-outline"
+                                    size={18}
+                                    color="#fff"
+                                />
+                                <Text style={styles.primaryButtonText}>
+                                    Ir a mis tareas
+                                </Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.secondaryButton,
+                                    pressed && styles.secondaryButtonPressed,
+                                ]}
+                                onPress={() => navigation.navigate('Inicio')}
+                            >
+                                <Ionicons
+                                    name="home-outline"
+                                    size={18}
+                                    color={theme.colors.text}
+                                />
+                                <Text style={styles.secondaryButtonText}>
+                                    Volver al inicio
+                                </Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.logoutButton,
+                                    pressed && styles.logoutButtonPressed,
+                                ]}
+                                onPress={handleLogout}
+                            >
+                                <Ionicons
+                                    name="log-out-outline"
+                                    size={18}
+                                    color={theme.colors.danger}
+                                />
+                                <Text style={styles.logoutButtonText}>
+                                    Cerrar sesión
+                                </Text>
+                            </Pressable>
+                        </View>
+                    </>
+                )}
+            </ScrollView>
+        </SafeAreaView>
+    );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#f8fafc',
-  },
-  title: {
-    marginBottom: 32,
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#111827',
-  },
-  label: {
-    marginTop: 16,
-    marginBottom: 6,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#334155',
-  },
-  value: {
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    fontSize: 16,
-    color: '#111827',
-  },
-});
