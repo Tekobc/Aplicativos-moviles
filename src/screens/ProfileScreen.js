@@ -25,25 +25,36 @@ export default function ProfileScreen({ navigation }) {
     const [loading, setLoading] = useState(true);
     const [image, setImage] = useState(null);
 
-    const pickImage = async () => {
-        try {
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ['images'],
-                allowsEditing: true,
-                quality: 1,
-            });
+const pickImage = async () => {
+    try {
+        const permission =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-            if (!result.canceled && result.assets?.length > 0) {
-                setImage(result.assets[0].uri);
-            }
-        } catch (error) {
-            console.log('Error al seleccionar imagen:', error);
-            Alert.alert('Error', 'No se pudo seleccionar la imagen.');
+        if (!permission.granted) {
+            Alert.alert(
+                'Permiso necesario',
+                'Necesitamos acceso a tus imágenes.'
+            );
+            return;
         }
-    };
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            quality: 1,
+        });
+
+        if (!result.canceled && result.assets?.length > 0) {
+            setImage(result.assets[0].uri);
+        }
+    } catch (error) {
+        console.log('Error al seleccionar imagen:', error);
+        Alert.alert('Error', 'No se pudo seleccionar la imagen.');
+    }
+};
 
     useEffect(() => {
-        pickImage();
+        
         const loadProfile = async () => {
             if (!user) {
                 setLoading(false);
