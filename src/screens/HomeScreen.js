@@ -123,6 +123,19 @@ export default function HomeScreen({ navigation }) {
                         </View>
                     </Pressable>
 
+                  <Pressable
+                        
+                        onPress={() => navigation.navigate('Location')}
+                    >
+                 
+                        <View style={styles.cardContent}>
+                   
+                        </View>
+                        <View style={styles.chevronWrapper}>
+                            <Ionicons name="chevron-forward" size={20} color={theme.colors.textMuted} />
+                        </View>
+                    </Pressable>
+
                     <Pressable
                         style={({ pressed }) => [
                             styles.actionCard,

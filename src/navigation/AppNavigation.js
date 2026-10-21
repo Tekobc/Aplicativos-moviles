@@ -17,7 +17,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import TasksScreen from '../screens/TasksScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-
+import LocationScreen from '../screens/LocationScreen';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -76,6 +76,11 @@ export default function AppNavigator() {
                         name="Tareas"
                         component={TasksScreen}
                     />
+                       <Stack.Screen
+                            name="Location"
+                            component={LocationScreen}
+                          />
+                          
                 </Stack.Navigator>
             ) : (
                 // Stack para usuarios no autenticados
